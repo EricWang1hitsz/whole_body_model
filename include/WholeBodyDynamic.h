@@ -1,7 +1,9 @@
 #include <RigidBodyDynamics.h>
 #include <rbdl/addons/urdfreader/urdfreader.h>
 
-namespace dwl
+
+
+namespace wbc
 
 {
 
@@ -13,7 +15,7 @@ public:
 
     ~WholeBodyDynamic();
 
-    void modelFromURDFModel(const std::string& urdf_model, bool info);
+    bool modelFromURDFModel();
 
     void fromGeneralizedJointState(rbd::Vector6d& base_state,
                                    Eigen::VectorXd& joint_state,
@@ -60,6 +62,8 @@ private:
 
     /** @brief The Coriolis, centrifugal and gravity force */
     Eigen::VectorXd nonliner_effects_;
+
+    //std::shared_ptr<wbc::WholeBodyKinematic> wkin_;
 
 
 };

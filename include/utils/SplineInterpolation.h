@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 
-namespace dwl
+namespace wbc
 {
 
 namespace math

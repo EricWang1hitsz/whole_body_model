@@ -6,7 +6,7 @@
 #include <vector>
 
 
-namespace dwl
+namespace wbc
 {
 
 enum AngleRepresentation {ZeroTo2Pi, MinusPiToPi};

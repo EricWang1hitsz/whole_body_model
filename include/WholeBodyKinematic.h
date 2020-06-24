@@ -1,6 +1,6 @@
 #include <RigidBodyDynamics.h>
 #include <rbdl/addons/urdfreader/urdfreader.h>
-namespace dwl
+namespace wbc
 
 {
 
@@ -11,7 +11,7 @@ public:
 
     ~WholeBodyKinematic();
 
-    void modelFromURDFModel(std::string& urdf_model, bool info);
+    bool modelFromURDFModel();
 
     int getNumberOfActiveEndEffectors(const rbd::BodySelector& body_set);
 
@@ -60,9 +60,11 @@ public:
                                              const Eigen::VectorXd& joint_vel,
                                              const rbd::BodySelector& body_set);
 
+    RigidBodyDynamics::Model rbd;
+
 private:
 
-    RigidBodyDynamics::Model rbd;
+
 
     rbd::BodyID body_id_;
 

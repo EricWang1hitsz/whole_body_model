@@ -5,7 +5,7 @@
 #include <utils/Math.h>
 
 
-namespace dwl
+namespace wbc
 {
 
 namespace rbd

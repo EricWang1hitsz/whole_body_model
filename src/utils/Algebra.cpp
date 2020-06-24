@@ -1,7 +1,7 @@
 #include <utils/Algebra.h>
 
 
-namespace dwl
+namespace wbc
 {
 
 namespace math

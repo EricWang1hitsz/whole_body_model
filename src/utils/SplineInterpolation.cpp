@@ -1,7 +1,7 @@
 #include <utils/SplineInterpolation.h>
 
 
-namespace dwl
+namespace wbc
 {
 
 

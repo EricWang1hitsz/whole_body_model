@@ -5,7 +5,7 @@
 #include <iomanip>
 
 using namespace std;
-using namespace dwl;
+using namespace wbc;
 
 int main(int argc, char **argv)
 {

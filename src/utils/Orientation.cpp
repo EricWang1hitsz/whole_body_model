@@ -1,7 +1,7 @@
 #include <utils/Orientation.h>
 
 
-namespace dwl
+namespace wbc
 {
 
 namespace math

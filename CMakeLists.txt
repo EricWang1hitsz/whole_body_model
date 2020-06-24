@@ -7,7 +7,8 @@ add_compile_options(-std=c++11)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED
+    roscpp)
 find_package(RBDL REQUIRED)
 find_package(RBDL COMPONENTS URDFReader REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -132,7 +133,8 @@ add_library(${PROJECT_NAME} SHARED
     src/utils/Geometry.cpp
     src/utils/Algebra.cpp
     src/utils/Orientation.cpp
-    src/utils/SplineInterpolation.cpp)
+    src/utils/SplineInterpolation.cpp
+    src/utils/URDF.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${RBDL_LIBRARY} ${RBDL_URDFReader_LIBRARY})
 ## Add cmake target dependencies of the library
@@ -145,11 +147,11 @@ target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${RBDL_LIBRARY} ${RBDL
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/whole_body_model_node.cpp)
 
-add_executable(KinematicSample test/testKinematic.cpp)
-target_link_libraries(KinematicSample ${catkin_LIBRARIES} ${PROJECT_NAME} ${RBDL_LIBRARY} ${RBDL_URDFReader_LIBRARY})
+#add_executable(KinematicSample test/testKinematic.cpp)
+#target_link_libraries(KinematicSample ${catkin_LIBRARIES} ${PROJECT_NAME} ${RBDL_LIBRARY} ${RBDL_URDFReader_LIBRARY})
 
-add_executable(DynamicSample test/testDynamic.cpp)
-target_link_libraries(DynamicSample ${catkin_LIBRARIES} ${PROJECT_NAME} ${RBDL_LIBRARY} ${RBDL_URDFReader_LIBRARY})
+#add_executable(DynamicSample test/testDynamic.cpp)
+#target_link_libraries(DynamicSample ${catkin_LIBRARIES} ${PROJECT_NAME} ${RBDL_LIBRARY} ${RBDL_URDFReader_LIBRARY})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

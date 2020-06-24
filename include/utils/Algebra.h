@@ -7,7 +7,7 @@
 #include <Eigen/Core>
 
 
-namespace dwl
+namespace wbc
 {
 
 namespace math

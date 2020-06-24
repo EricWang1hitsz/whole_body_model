@@ -1,11 +1,16 @@
 #include <WholeBodyDynamic.h>
+#include <utils/URDF.h>
+#include <ros/package.h>
+#include <ros/ros.h>
 
-namespace dwl {
+namespace wbc {
 
 WholeBodyDynamic::WholeBodyDynamic()
 {
     systemDOF = 18;
     jointDOF = 12;
+//    std::string urdf_file = "/home/eric/catkin_ws/src/whole_body_model/test/robot.urdf";
+//    modelFromURDFModel(urdf_file, false);
     std::cout << "Initializing WholeBodyDynamic Class " << std::endl;
 }
 
@@ -14,18 +19,35 @@ WholeBodyDynamic::~WholeBodyDynamic()
     std::cout << "Deconstructed WholeBodyKinematic Class " << std::endl;
 }
 
-void WholeBodyDynamic::modelFromURDFModel(const std::string &urdf_model, bool info)
+bool WholeBodyDynamic::modelFromURDFModel()
 {
-    char* urdf_model_ = (char*)urdf_model.c_str();
-    RigidBodyDynamics::Addons::URDFReadFromFile(urdf_model_, &rbd, true, false);
-
+    //std::string urdf_model = "/home/eric/catkin_ws/src/whole_body_model/test/robot.urdf";
+    //std::string urdf_file = "/home/eric/catkin_ws/src/quadruped_locomotion/quadruped_model/urdf/quadruped_model_float.urdf";
+    std::string urdf_file = "/home/eric/catkin_ws/src/quadruped_locomotion/quadruped_model/urdf/robot.urdf";
+    //std::string urdf_model = ros::package::getPath("quadruped_model") + "/urdf/quadruped_model_float.urdf";
+    char* urdf_model_ = (char*)urdf_file.c_str();
+    //std::string model_xml_string;
+    //model_xml_string = wbc::urdf_model::fileToXml(urdf_model);
+    //std::cout << "Test string " << std::endl;
+    //RigidBodyDynamics::Model rbd_model;
+    //RigidBodyDynamics::Addons::URDFReadFromString(model_xml_string.c_str(), &rbd_model, false);
+    RigidBodyDynamics::Addons::URDFReadFromFile(urdf_model_, &rbd, false);
+//    if(!RigidBodyDynamics::Addons::URDFReadFromFile(urdf_model_, &rbd, false))
+//        std::cerr << "Error loading model urdf " << std::endl;
+//        abort();
+    //wkin_.reset(new wbc::WholeBodyKinematic());
+    //rbd = wkin_->rbd;
     rbd::getListOfBodies(body_id_, rbd);
 
-    if(info)
-        rbd::printModelInfo(rbd);
 
+    //rbd::printModelInfo(rbd);
+
+
+    ROS_WARN("Load urdf dynamic model");
     joint_inertia_mat_.resize(systemDOF, systemDOF);
     joint_inertia_mat_.setZero();
+
+    return true;
 }
 
 const Eigen::VectorXd& WholeBodyDynamic::toGeneralizedJointState(const rbd::Vector6d& base_state,
@@ -107,12 +129,13 @@ const Eigen::MatrixXd& WholeBodyDynamic::computeJointSpaceInertiaMatrix(const rb
 {
     // Converting base and joint states to generalized joint states
     Eigen::VectorXd q = toGeneralizedJointState(base_pos, joint_pos);
-
     // Computing the joint space inertia matrix using the Composite
     // Rigid Body Algorithm
     // \f$ M(q) \f$
     RigidBodyDynamics::CompositeRigidBodyAlgorithm(rbd,
                                                    q, joint_inertia_mat_, true);
+
+    std::cout << "joint inertia mat size: " << joint_inertia_mat_.rows() << " x " << joint_inertia_mat_.cols() << std::endl;
 
     return joint_inertia_mat_;
 }

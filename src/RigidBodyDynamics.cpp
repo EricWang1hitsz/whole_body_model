@@ -1,7 +1,7 @@
 #include <RigidBodyDynamics.h>
 
 
-namespace dwl
+namespace wbc
 {
 
 namespace rbd

@@ -4,7 +4,7 @@
 #include <Eigen/Dense>
 
 
-namespace dwl
+namespace wbc
 {
 
 enum TypeOfOrientation {RollPitchYaw, Quaternion, RotationMatrix};

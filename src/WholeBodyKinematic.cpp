@@ -1,12 +1,15 @@
 #include <WholeBodyKinematic.h>
+#include <utils/URDF.h>
+#include <ros/package.h>
+#include <ros/ros.h>
 
-namespace dwl {
+namespace wbc {
 
 WholeBodyKinematic::WholeBodyKinematic()
 {
     systemDOF = 18;
     jointDOF = 12;
-    std::cout << "Initializing WholeBodyKinematic Class " << std::endl;
+    std::cout << "Initialized WholeBodyKinematic Class " << std::endl;
 }
 
 WholeBodyKinematic::~WholeBodyKinematic()
@@ -15,15 +18,28 @@ WholeBodyKinematic::~WholeBodyKinematic()
 }
 
 
-void WholeBodyKinematic::modelFromURDFModel(std::string &urdf_model, bool info)
+bool WholeBodyKinematic::modelFromURDFModel()
 {
-    char* urdf_model_ = (char*)urdf_model.c_str();
-    RigidBodyDynamics::Addons::URDFReadFromFile(urdf_model_, &rbd, true, false);
-
+    //std::string urdf_model = "/home/eric/catkin_ws/src/whole_body_model/test/robot.urdf";
+    //std::string urdf_file = "/home/eric/catkin_ws/src/quadruped_locomotion/quadruped_model/urdf/quadruped_model_float.urdf";
+    std::string urdf_file = "/home/eric/catkin_ws/src/quadruped_locomotion/quadruped_model/urdf/robot.urdf";
+    //std::string urdf_model = ros::package::getPath("quadruped_model") + "/urdf/quadruped_model_float.urdf";
+    char* urdf_model_ = (char*)urdf_file.c_str();
+    //std::string model_xml_string;
+    //model_xml_string = wbc::urdf_model::fileToXml(urdf_model);
+    //std::cout << "Test string " << std::endl;
+    //RigidBodyDynamics::Addons::URDFReadFromString(model_xml_string.c_str(), &rbd_model, false);
+    //RigidBodyDynamics::Model* model = new RigidBodyDynamics::Model();
+    RigidBodyDynamics::Addons::URDFReadFromFile(urdf_model_, &rbd, false);
+//    if(!RigidBodyDynamics::Addons::URDFReadFromFile(urdf_model.c_str(), &rbd, false))
+//        std::cerr << "Error loading model urdf " << std::endl;
+//        abort();
+    //std::cout << "Loaded successfully" << std::endl;
     rbd::getListOfBodies(body_id_, rbd);
 
-    if(info)
-        rbd::printModelInfo(rbd);
+    rbd::printModelInfo(rbd);
+    ROS_WARN("Load urdf kinematic model");
+    return true;
 }
 
 int WholeBodyKinematic::getNumberOfActiveEndEffectors(const rbd::BodySelector &body_set)
@@ -65,7 +81,9 @@ void WholeBodyKinematic::computeJacobian(Eigen::MatrixXd &jacobian,
 {
     // Only think about linear part
     int num_vars = 3;
+    // Must initilize kinematic's rbd model
     int num_body_set = getNumberOfActiveEndEffectors(body_set);
+    std::cout << "Active EndEffectors Number: " << num_body_set << std::endl;
     jacobian.resize(num_vars * num_body_set, systemDOF);
     // check jacobian matrix rows and cols.
     std::cout << "Full Jacobian Matrix Size:" << jacobian.rows() << "x" << jacobian.cols() << std::endl;
@@ -132,6 +150,8 @@ void WholeBodyKinematic::computeVelocity(rbd::BodyVectorXd &op_vel,
 
             Eigen::VectorXd q = toGeneralizedJointState(base_pos, joint_pos);
             Eigen::VectorXd q_dot = toGeneralizedJointState(base_vel, joint_vel);
+            // RBDL The a 6-D vector for which the first three elements are the angular velocity
+            // and the last three elements the linear velocity in the global reference system.
             rbd::Vector6d point_vel =
                     rbd::computePointVelocity(rbd, q, q_dot, body_id,
                                               Eigen::Vector3d::Zero(), true);
@@ -176,6 +196,8 @@ void WholeBodyKinematic::computeAcceleration(rbd::BodyVectorXd &op_acc,
                                                   q, q_dot, q_ddot,
                                                   body_id,
                                                   Eigen::Vector3d::Zero(), true);
+            // RBDL Note A 6-D vector where the first three elements are the angular acceleration
+            // and the last three elements the linear accelerations of the point.
             body_acc.segment<3>(0) = rbd::linearPart(point_acc);
 
             op_acc[body_name] = body_acc;
@@ -232,6 +254,7 @@ void WholeBodyKinematic::computeJdotQdot(rbd::BodyVectorXd &jacd_qd,
         {
             rbd::Vector6d point_vel = op_vel[body_name];
             Eigen::Vector3d ang_vel, lin_vel;
+            // first three elements are angular velocity
             ang_vel = rbd::angularPart(point_vel);
             lin_vel = rbd::linearPart(point_vel);
 
@@ -240,6 +263,7 @@ void WholeBodyKinematic::computeJdotQdot(rbd::BodyVectorXd &jacd_qd,
                     op_acc[body_name] + ang_vel.cross(lin_vel);
 
             jacd_qd[body_name] = body_jacd_qd;
+            std::cout << body_name << "jacd_qd: " << body_jacd_qd << std::endl;
 
         }
     }
